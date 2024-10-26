@@ -1,0 +1,167 @@
+{
+  "policyName": "Test Environment Configuration",
+  "description": "A comprehensive test policy using all available configuration options",
+  "version": "1.0.1",
+  "createdDate": "2024-10-26T00:00:00Z",
+  "modifiedDate": "2024-10-26T00:00:00Z",
+  "author": "NetNinja Test Suite",
+  
+  "configuration": {
+    "homePage": {
+      "name": "HomePage",
+      "description": "Corporate homepage URL",
+      "defaultValue": "https://test.netninja.com",
+      "dataType": "string",
+      "required": true,
+      "validationRegex": "^https?:\\/\\/.*$"
+    },
+    "maxMemory": {
+      "name": "MaxMemory",
+      "description": "Maximum memory allocation",
+      "defaultValue": "1024",
+      "dataType": "int",
+      "required": true,
+      "minValue": "512",
+      "maxValue": "4096"
+    },
+    "environment": {
+      "name": "Environment",
+      "description": "Target environment",
+      "defaultValue": "Production",
+      "dataType": "string",
+      "required": true,
+      "allowedValues": ["Development", "Staging", "Production"]
+    },
+    "debugMode": {
+      "name": "DebugMode",
+      "description": "Enable debug logging",
+      "defaultValue": "false",
+      "dataType": "bool",
+      "required": false
+    }
+  },
+
+  "policies": [
+    {
+      "name": "Configure System Settings",
+      "description": "Basic system configuration",
+      "enabled": true,
+      "category": "System",
+      "requiresReboot": true,
+      "targetOSVersion": "Windows 10+",
+      "requiredConfigurations": ["maxMemory", "environment"],
+      "settings": [
+        {
+          "settingType": "Registry",
+          "sequence": 1,
+          "required": true,
+          "hive": "HKLM",
+          "keyPath": "SOFTWARE\\NetNinja\\TestPolicy",
+          "valueName": "MaxMemory",
+          "valueType": "REG_DWORD",
+          "value": "${maxMemory}",
+          "operation": "Create"
+        },
+        {
+          "settingType": "Registry",
+          "sequence": 2,
+          "required": true,
+          "hive": "HKLM",
+          "keyPath": "SOFTWARE\\NetNinja\\TestPolicy",
+          "valueName": "Environment",
+          "valueType": "REG_SZ",
+          "value": "${environment}",
+          "operation": "Create"
+        }
+      ]
+    },
+    {
+      "name": "Configure Security Settings",
+      "description": "Security policy configuration",
+      "enabled": true,
+      "category": "Security",
+      "requiresReboot": false,
+      "targetOSVersion": "Windows 10+",
+      "settings": [
+        {
+          "settingType": "SecurityPolicy",
+          "sequence": 1,
+          "required": true,
+          "area": "PasswordPolicy",
+          "setting": "MinimumPasswordLength",
+          "value": "12"
+        },
+        {
+          "settingType": "FirewallRule",
+          "sequence": 2,
+          "required": true,
+          "name": "Block Incoming Test Traffic",
+          "direction": "Inbound",
+          "action": "Block",
+          "protocol": ["TCP"],
+          "localPort": ["12345"],
+          "enabled": true
+        }
+      ]
+    },
+    {
+      "name": "Configure Services",
+      "description": "Service configuration",
+      "enabled": true,
+      "category": "System",
+      "requiresReboot": false,
+      "settings": [
+        {
+          "settingType": "ServiceConfig",
+          "sequence": 1,
+          "required": true,
+          "serviceName": "TestService",
+          "startupType": "Automatic",
+          "action": "Start",
+          "configuration": {
+            "dependsOn": "RpcSs"
+          }
+        },
+        {
+          "settingType": "ScheduledTask",
+          "sequence": 2,
+          "required": false,
+          "taskName": "TestTask",
+          "taskPath": "\\NetNinja\\Maintenance",
+          "description": "Test maintenance task",
+          "author": "NetNinja",
+          "runAs": "SYSTEM",
+          "triggers": {
+            "type": "Daily",
+            "startTime": "03:00"
+          },
+          "actions": {
+            "execute": "C:\\Windows\\System32\\cleanmgr.exe",
+            "arguments": "/sagerun:1"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Configure Scripts",
+      "description": "Script execution configuration",
+      "enabled": true,
+      "category": "Applications",
+      "requiresReboot": false,
+      "settings": [
+        {
+          "settingType": "Script",
+          "sequence": 1,
+          "required": true,
+          "scriptType": "PowerShell",
+          "scriptContent": "Write-Host 'Testing script execution'",
+          "parameters": {
+            "ExecutionPolicy": "Bypass"
+          },
+          "runAsSystem": true,
+          "timeoutSeconds": 300
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,99 @@
+{
+  "policyName": "Test Environment Configuration",
+  "description": "A comprehensive test policy using all available configuration options (v1.0.0)",
+  "version": "1.0.0",
+  "createdDate": "2024-10-26T00:00:00Z",
+  "modifiedDate": "2024-10-26T00:00:00Z",
+  "author": "NetNinja Test Suite",
+  
+  "configuration": {
+    "homePage": {
+      "name": "HomePage",
+      "description": "Corporate homepage URL",
+      "defaultValue": "https://test.netninja.com",
+      "dataType": "string",
+      "required": true,
+      "validationRegex": "^https?:\\/\\/.*$"
+    },
+    "maxMemory": {
+      "name": "MaxMemory",
+      "description": "Maximum memory allocation",
+      "defaultValue": "512",
+      "dataType": "int",
+      "required": true,
+      "minValue": "256",
+      "maxValue": "2048"
+    },
+    "environment": {
+      "name": "Environment",
+      "description": "Target environment",
+      "defaultValue": "Development",
+      "dataType": "string",
+      "required": true,
+      "allowedValues": ["Development", "Staging", "Production"]
+    }
+  },
+
+  "policies": [
+    {
+      "name": "Configure System Settings",
+      "description": "Basic system configuration (v1.0.0)",
+      "enabled": true,
+      "category": "System",
+      "requiresReboot": true,
+      "targetOSVersion": "Windows 10+",
+      "requiredConfigurations": ["maxMemory", "environment"],
+      "settings": [
+        {
+          "settingType": "Registry",
+          "sequence": 1,
+          "required": true,
+          "hive": "HKLM",
+          "keyPath": "SOFTWARE\\NetNinja\\TestPolicy",
+          "valueName": "MaxMemory",
+          "valueType": "REG_DWORD",
+          "value": "${maxMemory}",
+          "operation": "Create"
+        }
+      ]
+    },
+    {
+      "name": "Configure Security Settings",
+      "description": "Security policy configuration",
+      "enabled": true,
+      "category": "Security",
+      "requiresReboot": false,
+      "targetOSVersion": "Windows 10+",
+      "settings": [
+        {
+          "settingType": "SecurityPolicy",
+          "sequence": 1,
+          "required": true,
+          "area": "PasswordPolicy",
+          "setting": "MinimumPasswordLength",
+          "value": "8"
+        }
+      ]
+    },
+    {
+      "name": "Configure Services",
+      "description": "Service configuration",
+      "enabled": true,
+      "category": "System",
+      "requiresReboot": false,
+      "settings": [
+        {
+          "settingType": "ServiceConfig",
+          "sequence": 1,
+          "required": true,
+          "serviceName": "TestService",
+          "startupType": "Manual",
+          "action": "Start",
+          "configuration": {
+            "dependsOn": "RpcSs"
+          }
+        }
+      ]
+    }
+  ]
+}
