@@ -72,6 +72,17 @@
           "area": "PasswordPolicy",
           "setting": "MinimumPasswordLength",
           "value": "8"
+        },
+        {
+          "settingType": "FirewallRule",
+          "sequence": 2,
+          "required": true,
+          "name": "Block Incoming Test Traffic",
+          "direction": "Inbound",
+          "action": "Block",
+          "protocol": ["TCP"],
+          "localPort": ["8080"],
+          "enabled": true
         }
       ]
     },
@@ -91,6 +102,25 @@
           "action": "Start",
           "configuration": {
             "dependsOn": "RpcSs"
+          }
+        },
+        {
+          "settingType": "ScheduledTask",
+          "sequence": 2,
+          "required": false,
+          "taskName": "TestTask",
+          "taskPath": "\\NetNinja\\Maintenance",
+          "description": "Test maintenance task",
+          "author": "NetNinja",
+          "runAs": "SYSTEM",
+          "triggers": {
+            "type": "Daily",
+            "startTime": "02:00",
+            "enabled": true
+          },
+          "actions": {
+            "execute": "C:\\Windows\\System32\\cleanmgr.exe",
+            "arguments": "/sagerun:1"
           }
         }
       ]
