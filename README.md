@@ -62,7 +62,8 @@ Sacred Checklist:
 ## ⚡ Deployment Strike
 Access battle-ready policies via the shadow network:
 ```
-https://policies.netninja.com/ClanName/TechniqueName/vX.Y.Z.msgpack
+https://policies.netninja.app/ClanName/TechniqueName/vX.Y.Z.msgpack
+https://policies.netninja.app/Latest.msgpack
 ```
 
 ## 🔒 Territory Protection
