@@ -19,25 +19,37 @@ POLICY_SCHEMA = {
         "modifiedDate": {"type": "string", "format": "date-time"},
         "author": {"type": "string"},
         "configuration": {
-            "type": "object",
-            "additionalProperties": {
-                "type": "object",
-                "required": ["name", "description", "defaultValue", "dataType"],
-                "properties": {
-                    "name": {"type": "string"},
-                    "description": {"type": "string"},
-                    "defaultValue": {"type": "string"},
-                    "dataType": {"type": "string", "enum": ["string", "int", "bool"]},
-                    "required": {"type": "boolean"},
-                    "validationRegex": {"type": "string"},
-                    "minValue": {"type": "string"},
-                    "maxValue": {"type": "string"},
-                    "allowedValues": {
-                        "type": "array",
-                        "items": {"type": "string"}
+            "oneOf": [
+                # Allow empty array
+                {
+                    "type": "array",
+                    "items": {
+                        "type": "object"
+                    }
+                },
+                # Allow object with configuration properties
+                {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "object",
+                        "required": ["name", "description", "defaultValue", "dataType"],
+                        "properties": {
+                            "name": {"type": "string"},
+                            "description": {"type": "string"},
+                            "defaultValue": {"type": "string"},
+                            "dataType": {"type": "string", "enum": ["string", "int", "bool"]},
+                            "required": {"type": "boolean"},
+                            "validationRegex": {"type": "string"},
+                            "minValue": {"type": "string"},
+                            "maxValue": {"type": "string"},
+                            "allowedValues": {
+                                "type": "array",
+                                "items": {"type": "string"}
+                            }
+                        }
                     }
                 }
-            }
+            ]
         },
         "policies": {
             "type": "array",
