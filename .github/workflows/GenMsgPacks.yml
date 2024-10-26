@@ -1,0 +1,39 @@
+name: Generate MessagePack Files
+on:
+  push:
+    paths:
+      - 'Policies/**/*.json'
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  convert-to-msgpack:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2  # Need previous commit for diff
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+          
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install msgpack jsonschema
+
+      - name: Convert JSON to MessagePack
+        run: |
+          python .github/scripts/generate_msgpack.py
+        
+      - name: Commit and Push if Changed
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add 'Policies/**/*.msgpack'
+          git diff --quiet && git diff --staged --quiet || (git commit -m "🥷 Generate MessagePack files" && git push)
