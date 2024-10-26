@@ -180,7 +180,7 @@ def convert_to_msgpack(json_path):
         msgpack_size = os.path.getsize(msgpack_path)
         compression_ratio = (1 - (msgpack_size / json_size)) * 100
         
-        print(f"✅ Converted {json_path} to MessagePack")
+        print(f"✅ Converted {json_path} to {msgpack_path}")
         print(f"   📊 Compression: {json_size:,} bytes → {msgpack_size:,} bytes ({compression_ratio:.1f}% smaller)")
         return True
         
