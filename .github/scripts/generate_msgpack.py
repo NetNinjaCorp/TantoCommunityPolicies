@@ -18,7 +18,27 @@ POLICY_SCHEMA = {
         "createdDate": {"type": "string", "format": "date-time"},
         "modifiedDate": {"type": "string", "format": "date-time"},
         "author": {"type": "string"},
-        "configuration": {"type": "array"},
+        "configuration": {
+            "type": "object",
+            "additionalProperties": {
+                "type": "object",
+                "required": ["name", "description", "defaultValue", "dataType"],
+                "properties": {
+                    "name": {"type": "string"},
+                    "description": {"type": "string"},
+                    "defaultValue": {"type": "string"},
+                    "dataType": {"type": "string", "enum": ["string", "int", "bool"]},
+                    "required": {"type": "boolean"},
+                    "validationRegex": {"type": "string"},
+                    "minValue": {"type": "string"},
+                    "maxValue": {"type": "string"},
+                    "allowedValues": {
+                        "type": "array",
+                        "items": {"type": "string"}
+                    }
+                }
+            }
+        },
         "policies": {
             "type": "array",
             "items": {
@@ -30,7 +50,37 @@ POLICY_SCHEMA = {
                     "enabled": {"type": "boolean"},
                     "category": {"type": "string"},
                     "requiresReboot": {"type": "boolean"},
-                    "settings": {"type": "array"}
+                    "settings": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "required": ["settingType"],
+                            "properties": {
+                                "settingType": {"type": "string"},
+                                "sequence": {"type": "integer"},
+                                "required": {"type": "boolean"},
+                                "enabled": {"type": "boolean"},
+                                "name": {"type": "string"},
+                                "description": {"type": "string"},
+                                "hive": {"type": "string"},
+                                "keyPath": {"type": "string"},
+                                "valueName": {"type": "string"},
+                                "valueType": {"type": "string"},
+                                "value": {"type": ["string", "integer"]},
+                                "operation": {"type": "string"},
+                                "direction": {"type": "string"},
+                                "action": {"type": "string"},
+                                "protocol": {
+                                    "type": "array",
+                                    "items": {"type": "string"}
+                                },
+                                "remoteAddress": {
+                                    "type": "array",
+                                    "items": {"type": "string"}
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -77,9 +127,11 @@ def convert_to_msgpack(json_path):
         with open(json_path, 'r') as f:
             data = json.load(f)
         
-        # Validate the policy
-        if not validate_policy(data, json_path):
-            return False
+        # Skip validation for latest.json
+        if not json_path.endswith('latest.json'):
+            # Validate the policy
+            if not validate_policy(data, json_path):
+                return False
         
         # Create MessagePack file path
         msgpack_path = json_path.rsplit('.', 1)[0] + '.msgpack'
@@ -117,10 +169,6 @@ def main():
     
     # Process each file
     for json_file in json_files:
-        # Skip latest.json
-        if json_file.endswith('latest.json'):
-            continue
-            
         print(f"\n📄 Processing {json_file}")
         if convert_to_msgpack(json_file):
             success_count += 1
