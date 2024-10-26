@@ -13,16 +13,17 @@ def find_latest_version(policy_path):
             try:
                 # Strip the 'v' prefix and '.json' suffix
                 version = file[1:-5]
-                # Parse version to validate and compare
-                semver.parse(version)
-                versions.append(version)
+                # Validate version format
+                if semver.VersionInfo.isvalid(version):
+                    versions.append(version)
             except ValueError:
                 continue
     
     if not versions:
         return None
     
-    return max(versions, key=lambda v: semver.parse(v))
+    # Sort versions using semver and return the latest
+    return str(max(map(semver.VersionInfo.parse, versions)))
 
 def generate_catalog():
     """Generate a catalog of all policies and their latest versions."""
