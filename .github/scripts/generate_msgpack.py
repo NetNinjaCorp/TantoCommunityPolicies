@@ -7,10 +7,48 @@ import sys
 from typing import Dict, Any
 from jsonschema import validate
 
+# Define the schema for a settings object that can contain nested settings
+SETTINGS_SCHEMA = {
+    "type": "object",
+    "properties": {
+        "settingType": {"type": "string"},
+        "sequence": {"type": "integer"},
+        "required": {"type": "boolean"},
+        "enabled": {"type": "boolean"},
+        "name": {"type": "string"},
+        "description": {"type": "string"},
+        "hive": {"type": "string"},
+        "keyPath": {"type": "string"},
+        "valueName": {"type": "string"},
+        "valueType": {"type": "string"},
+        "value": {"type": ["string", "integer"]},
+        "operation": {"type": "string"},
+        "direction": {"type": "string"},
+        "action": {"type": "string"},
+        "category": {"type": "string"},
+        "requiresReboot": {"type": "boolean"},
+        "protocol": {
+            "type": "array",
+            "items": {"type": "string"}
+        },
+        "remoteAddress": {
+            "type": "array",
+            "items": {"type": "string"}
+        },
+        "settings": {
+            "type": "array",
+            "items": {"$ref": "#/definitions/setting"}
+        }
+    }
+}
+
 # Define the expected schema for Tanto policies
 POLICY_SCHEMA = {
     "type": "object",
     "required": ["policyName", "description", "version", "createdDate", "modifiedDate", "author", "policies"],
+    "definitions": {
+        "setting": SETTINGS_SCHEMA
+    },
     "properties": {
         "policyName": {"type": "string"},
         "description": {"type": "string"},
@@ -20,14 +58,12 @@ POLICY_SCHEMA = {
         "author": {"type": "string"},
         "configuration": {
             "oneOf": [
-                # Allow empty array
                 {
                     "type": "array",
                     "items": {
                         "type": "object"
                     }
                 },
-                # Allow object with configuration properties
                 {
                     "type": "object",
                     "additionalProperties": {
@@ -64,34 +100,7 @@ POLICY_SCHEMA = {
                     "requiresReboot": {"type": "boolean"},
                     "settings": {
                         "type": "array",
-                        "items": {
-                            "type": "object",
-                            "required": ["settingType"],
-                            "properties": {
-                                "settingType": {"type": "string"},
-                                "sequence": {"type": "integer"},
-                                "required": {"type": "boolean"},
-                                "enabled": {"type": "boolean"},
-                                "name": {"type": "string"},
-                                "description": {"type": "string"},
-                                "hive": {"type": "string"},
-                                "keyPath": {"type": "string"},
-                                "valueName": {"type": "string"},
-                                "valueType": {"type": "string"},
-                                "value": {"type": ["string", "integer"]},
-                                "operation": {"type": "string"},
-                                "direction": {"type": "string"},
-                                "action": {"type": "string"},
-                                "protocol": {
-                                    "type": "array",
-                                    "items": {"type": "string"}
-                                },
-                                "remoteAddress": {
-                                    "type": "array",
-                                    "items": {"type": "string"}
-                                }
-                            }
-                        }
+                        "items": {"$ref": "#/definitions/setting"}
                     }
                 }
             }
