@@ -126,7 +126,8 @@ def validate_policy(data: Dict[str, Any], file_path: str) -> bool:
         return False
 
 def get_changed_files():
-    """Get list of JSON files changed in the latest commit."""
+    """Get list of JSON files changed in the latest commit, always including latest.json."""
+    changed_files = []
     try:
         # If running in GitHub Actions
         if os.environ.get('GITHUB_EVENT_NAME') == 'push':
@@ -136,18 +137,15 @@ def get_changed_files():
                 capture_output=True,
                 text=True
             )
-            files = result.stdout.splitlines()
-            return [f for f in files if f.endswith('.json') and f.startswith('Policies/')]
+            changed_files = result.stdout.splitlines()
     except Exception as e:
         print(f"Error getting changed files: {e}")
     
-    # Fallback: process all JSON files
-    json_files = []
-    for root, _, files in os.walk('Policies'):
-        for file in files:
-            if file.endswith('.json'):
-                json_files.append(os.path.join(root, file))
-    return json_files
+    # Include `latest.json` explicitly
+    if 'Policies/latest.json' not in changed_files:
+        changed_files.append('Policies/latest.json')
+
+    return [f for f in changed_files if f.endswith('.json') and f.startswith('Policies/')]
 
 def convert_to_msgpack(json_path):
     """Convert a JSON file to MessagePack format after validation."""
