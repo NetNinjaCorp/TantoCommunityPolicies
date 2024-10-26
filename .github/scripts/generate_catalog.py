@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import os
 import json
+import datetime
 from pathlib import Path
 import semver
 
@@ -21,7 +22,7 @@ def find_latest_version(policy_path):
     if not versions:
         return None
     
-    return max(versions, key=lambda v: semver.parse(version))
+    return max(versions, key=lambda v: semver.parse(v))
 
 def generate_catalog():
     """Generate a catalog of all policies and their latest versions."""
@@ -70,6 +71,7 @@ def generate_catalog():
     }
     
     # Write the catalog file
+    os.makedirs(policies_dir, exist_ok=True)
     with open(policies_dir / 'latest.json', 'w') as f:
         json.dump(catalog, f, indent=2)
 
