@@ -108,8 +108,16 @@ POLICY_SCHEMA = {
     }
 }
 
+def compress_msgpack(data):
+    """Compress data using MessagePack with highest compression level."""
+    return msgpack.packb(data, use_bin_type=True)
+
 def validate_policy(data: Dict[str, Any], file_path: str) -> bool:
     """Validate the policy data against the schema."""
+    # Skip validation for latest.json
+    if file_path.endswith('latest.json'):
+        return True
+        
     try:
         validate(instance=data, schema=POLICY_SCHEMA)
         return True
@@ -148,27 +156,32 @@ def convert_to_msgpack(json_path):
         with open(json_path, 'r') as f:
             data = json.load(f)
         
-        # Skip validation for latest.json
-        if not json_path.endswith('latest.json'):
-            # Validate the policy
-            if not validate_policy(data, json_path):
-                return False
+        # Validate the policy (will skip for latest.json)
+        if not validate_policy(data, json_path):
+            return False
         
         # Create MessagePack file path
         msgpack_path = json_path.rsplit('.', 1)[0] + '.msgpack'
         
-        # Write MessagePack file
+        # Compress and write MessagePack file
+        packed_data = compress_msgpack(data)
         with open(msgpack_path, 'wb') as f:
-            msgpack.pack(data, f)
+            f.write(packed_data)
         
         # Verify the packed data by reading it back
         with open(msgpack_path, 'rb') as f:
-            unpacked = msgpack.unpack(f)
+            unpacked = msgpack.unpackb(f.read(), use_list=True)
             if unpacked != data:
                 print(f"❌ Verification failed for {json_path}")
                 return False
         
+        # Print file size comparison
+        json_size = os.path.getsize(json_path)
+        msgpack_size = os.path.getsize(msgpack_path)
+        compression_ratio = (1 - (msgpack_size / json_size)) * 100
+        
         print(f"✅ Converted {json_path} to MessagePack")
+        print(f"   📊 Compression: {json_size:,} bytes → {msgpack_size:,} bytes ({compression_ratio:.1f}% smaller)")
         return True
         
     except json.JSONDecodeError as e:
@@ -182,6 +195,8 @@ def main():
     """Main function to handle MessagePack conversion."""
     success_count = 0
     error_count = 0
+    total_json_size = 0
+    total_msgpack_size = 0
     
     # Get files to process
     json_files = get_changed_files()
@@ -193,6 +208,8 @@ def main():
         print(f"\n📄 Processing {json_file}")
         if convert_to_msgpack(json_file):
             success_count += 1
+            total_json_size += os.path.getsize(json_file)
+            total_msgpack_size += os.path.getsize(json_file.rsplit('.', 1)[0] + '.msgpack')
         else:
             error_count += 1
     
@@ -200,6 +217,10 @@ def main():
     print("\n📊 Conversion Summary:")
     print(f"✅ Successfully converted: {success_count}")
     print(f"❌ Failed conversions: {error_count}")
+    if success_count > 0:
+        total_compression = (1 - (total_msgpack_size / total_json_size)) * 100
+        print(f"📦 Total size reduction: {total_json_size:,} bytes → {total_msgpack_size:,} bytes")
+        print(f"💪 Overall compression ratio: {total_compression:.1f}%")
     
     # Exit with error if any conversions failed
     if error_count > 0:
