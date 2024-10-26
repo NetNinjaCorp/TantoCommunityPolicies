@@ -1,0 +1,22 @@
+{
+  "policies": [
+    {
+      "company": "NetNinja",
+      "name": "Test Environment Configuration",
+      "description": "A comprehensive test policy using all available configuration options",
+      "version": "1.0.1",
+      "path": "NetNinja/TestManifest/v1.0.1.json"
+    },
+    {
+      "company": "NetNinja",
+      "name": "Windows Privacy Enhancement",
+      "description": "Comprehensive policy to disable Windows telemetry, tracking, and data collection features",
+      "version": "1.0.2",
+      "path": "NetNinja/Privacy/v1.0.2.json"
+    }
+  ],
+  "metadata": {
+    "totalPolicies": 2,
+    "lastUpdated": "2024-10-26T05:38:28.310564Z"
+  }
+}
