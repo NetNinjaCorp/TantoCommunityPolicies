@@ -36,4 +36,5 @@ jobs:
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git add 'Policies/**/*.msgpack'
+           git add 'Policies/*.msgpack'
           git diff --quiet && git diff --staged --quiet || (git commit -m "🥷 Generate MessagePack files" && git push)
