@@ -1,0 +1,265 @@
+{
+  "policyName": "Windows Privacy Enhancement",
+  "description": "Comprehensive policy to disable Windows telemetry, tracking, and data collection features",
+  "version": "1.0.0",
+  "createdDate": "2024-10-26T00:00:00Z",
+  "modifiedDate": "2024-10-26T00:00:00Z",
+  "author": "NetNinja",
+  
+  "configuration": [],
+
+  "policies": [
+    {
+      "name": "Disable Telemetry Services",
+      "description": "Disables Windows telemetry and diagnostic services",
+      "enabled": true,
+      "category": "Privacy",
+      "requiresReboot": true,
+      "targetOSVersion": "Windows 10+",
+      "settings": [
+        {
+          "settingType": "ServiceConfig",
+          "sequence": 1,
+          "required": true,
+          "serviceName": "DiagTrack",
+          "startupType": "Disabled",
+          "action": "Stop"
+        },
+        {
+          "settingType": "ServiceConfig",
+          "sequence": 2,
+          "required": true,
+          "serviceName": "diagnosticshub.standardcollector.service",
+          "startupType": "Disabled",
+          "action": "Stop"
+        },
+        {
+          "settingType": "ServiceConfig",
+          "sequence": 3,
+          "required": true,
+          "serviceName": "dmwappushservice",
+          "startupType": "Disabled",
+          "action": "Stop"
+        },
+        {
+          "settingType": "ServiceConfig",
+          "sequence": 4,
+          "required": true,
+          "serviceName": "RemoteRegistry",
+          "startupType": "Disabled",
+          "action": "Stop"
+        },
+        {
+          "settingType": "ServiceConfig",
+          "sequence": 5,
+          "required": true,
+          "serviceName": "TrkWks",
+          "startupType": "Disabled",
+          "action": "Stop"
+        }
+      ]
+    },
+    {
+      "name": "Disable Gaming Services",
+      "description": "Disables Xbox and gaming related services",
+      "enabled": true,
+      "category": "Privacy",
+      "requiresReboot": false,
+      "settings": [
+        {
+          "settingType": "ServiceConfig",
+          "sequence": 1,
+          "required": true,
+          "serviceName": "XblAuthManager",
+          "startupType": "Disabled",
+          "action": "Stop"
+        },
+        {
+          "settingType": "ServiceConfig",
+          "sequence": 2,
+          "required": true,
+          "serviceName": "XblGameSave",
+          "startupType": "Disabled",
+          "action": "Stop"
+        },
+        {
+          "settingType": "ServiceConfig",
+          "sequence": 3,
+          "required": true,
+          "serviceName": "XboxNetApiSvc",
+          "startupType": "Disabled",
+          "action": "Stop"
+        }
+      ]
+    },
+    {
+      "name": "Disable Optional Services",
+      "description": "Disables various optional Windows services",
+      "enabled": true,
+      "category": "System",
+      "requiresReboot": false,
+      "settings": [
+        {
+          "settingType": "ServiceConfig",
+          "sequence": 1,
+          "required": true,
+          "serviceName": "MapsBroker",
+          "startupType": "Disabled",
+          "action": "Stop"
+        },
+        {
+          "settingType": "ServiceConfig",
+          "sequence": 2,
+          "required": true,
+          "serviceName": "NetTcpPortSharing",
+          "startupType": "Disabled",
+          "action": "Stop"
+        },
+        {
+          "settingType": "ServiceConfig",
+          "sequence": 3,
+          "required": true,
+          "serviceName": "WMPNetworkSvc",
+          "startupType": "Disabled",
+          "action": "Stop"
+        }
+      ]
+    },
+    {
+      "name": "Configure Privacy Registry Settings",
+      "description": "Sets registry keys to enhance privacy",
+      "enabled": true,
+      "category": "Privacy",
+      "requiresReboot": true,
+      "settings": [
+        {
+          "settingType": "Registry",
+          "sequence": 1,
+          "required": true,
+          "hive": "HKLM",
+          "keyPath": "SOFTWARE\\Policies\\Microsoft\\Windows\\DataCollection",
+          "valueName": "AllowTelemetry",
+          "valueType": "REG_DWORD",
+          "value": "0",
+          "operation": "Create"
+        },
+        {
+          "settingType": "Registry",
+          "sequence": 2,
+          "required": true,
+          "hive": "HKLM",
+          "keyPath": "SOFTWARE\\Policies\\Microsoft\\Windows\\CloudContent",
+          "valueName": "DisableWindowsConsumerFeatures",
+          "valueType": "REG_DWORD",
+          "value": "1",
+          "operation": "Create"
+        },
+        {
+          "settingType": "Registry",
+          "sequence": 3,
+          "required": true,
+          "hive": "HKLM",
+          "keyPath": "SOFTWARE\\Policies\\Microsoft\\Windows\\System",
+          "valueName": "EnableActivityFeed",
+          "valueType": "REG_DWORD",
+          "value": "0",
+          "operation": "Create"
+        }
+      ]
+    },
+    {
+      "name": "Disable Scheduled Tasks",
+      "description": "Disables Windows telemetry and tracking related scheduled tasks",
+      "enabled": true,
+      "category": "Privacy",
+      "requiresReboot": false,
+      "settings": [
+        {
+          "settingType": "ScheduledTask",
+          "sequence": 1,
+          "required": true,
+          "taskName": "Microsoft Compatibility Appraiser",
+          "taskPath": "\\Microsoft\\Windows\\Application Experience",
+          "description": "Disable compatibility data collection",
+          "author": "NetNinja",
+          "runAs": "SYSTEM",
+          "triggers": {
+            "type": "Daily",
+            "enabled": false
+          },
+          "actions": {
+            "execute": "C:\\Windows\\System32\\compatibility.dll"
+          }
+        },
+        {
+          "settingType": "ScheduledTask",
+          "sequence": 2,
+          "required": true,
+          "taskName": "Consolidator",
+          "taskPath": "\\Microsoft\\Windows\\Customer Experience Improvement Program",
+          "description": "Disable CEIP data collection",
+          "author": "NetNinja",
+          "runAs": "SYSTEM",
+          "triggers": {
+            "type": "Daily",
+            "enabled": false
+          },
+          "actions": {
+            "execute": "C:\\Windows\\System32\\wsqmcons.exe"
+          }
+        },
+        {
+          "settingType": "ScheduledTask",
+          "sequence": 3,
+          "required": true,
+          "taskName": "KernelCeipTask",
+          "taskPath": "\\Microsoft\\Windows\\Customer Experience Improvement Program",
+          "description": "Disable kernel CEIP collection",
+          "author": "NetNinja",
+          "runAs": "SYSTEM",
+          "triggers": {
+            "type": "Daily",
+            "enabled": false
+          },
+          "actions": {
+            "execute": "C:\\Windows\\System32\\kernelceip.dll"
+          }
+        },
+        {
+          "settingType": "ScheduledTask",
+          "sequence": 4,
+          "required": true,
+          "taskName": "UsbCeip",
+          "taskPath": "\\Microsoft\\Windows\\Customer Experience Improvement Program",
+          "description": "Disable USB CEIP collection",
+          "author": "NetNinja",
+          "runAs": "SYSTEM",
+          "triggers": {
+            "type": "Daily",
+            "enabled": false
+          },
+          "actions": {
+            "execute": "C:\\Windows\\System32\\usbceip.dll"
+          }
+        },
+        {
+          "settingType": "ScheduledTask",
+          "sequence": 5,
+          "required": true,
+          "taskName": "Microsoft-Windows-DiskDiagnosticDataCollector",
+          "taskPath": "\\Microsoft\\Windows\\DiskDiagnostic",
+          "description": "Disable disk diagnostic data collection",
+          "author": "NetNinja",
+          "runAs": "SYSTEM",
+          "triggers": {
+            "type": "Daily",
+            "enabled": false
+          },
+          "actions": {
+            "execute": "C:\\Windows\\System32\\diskdiag.dll"
+          }
+        }
+      ]
+    }
+  ]
+}
